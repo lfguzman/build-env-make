@@ -19,5 +19,5 @@ To use it:
 8. once you have some code and tests, you can compile them and run them with make: "$ make check"
 
 Targets:
-$ make check   # compiles and executes all AUTs
-$ make   # compiles the code in current directory and its children
+1. make check   # compiles and executes all AUTs
+2. make   # compiles the code in current directory and its children
