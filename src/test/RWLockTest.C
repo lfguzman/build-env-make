@@ -26,7 +26,7 @@ public:
     }
 };
 
-template <class T = Member>   // make it a template
+template <class T = Member>
 class Parent2 : public IParent
 {
 public:
@@ -38,10 +38,10 @@ public:
         member->member_method();
     }
 private:
-    member_type* member; // member is now of type T (i.e. member_type)
+    member_type* member; // member is now of type T* (i.e. member_type*)
 };
 
-template <class T = Member>   // make it a template
+template <class T = Member>
 class Parent : public IParent
 {
 public:

@@ -21,15 +21,15 @@ INCLUDE_DIR = $(ROOT_DIR)/include
 LIB_DIR = $(ROOT_DIR)/lib
 LIB_STATIC_DIR = $(LIB_DIR)/static
 
-# Google Test directories
-GTEST_DIR = /Users/luis/usr/applications/sandbox/googletest/googletest
-GTEST_LIB_DIR = $(GTEST_DIR)/LFGgccmake
-
-GMOCK_DIR = /Users/luis/usr/applications/sandbox/googletest/googlemock
-GMOCK_LIB_DIR = $(GMOCK_DIR)/make
+# Google Test and Google Mock directories (now both part of googletest)
+GTEST_DIR = /usr/local
+# for g++-8.2 -std=c++17
+GTEST_LIB_DIR = $(GTEST_DIR)/lib/gccgtest
+# for clang++
+#GTEST_LIB_DIR = $(GTEST_DIR)/lib/gccgtest
 
 # C++ compiler and std version
-CXX = g++-7.2.0
+CXX = g++-8.2
 CPPSTD = -std=c++17
 
 # Flags passed to the C++ compiler

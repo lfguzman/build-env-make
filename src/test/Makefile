@@ -17,16 +17,13 @@ target = alltests
 # the compiler doesn't generate warnings in Google Test headers.
 CPPFLAGS += \
     -isystem $(GTEST_DIR)/include \
-    -isystem $(GMOCK_DIR)/include \
     -I.. \
 
 CXXFLAGS += \
-    -I$(GTEST_DIR) \
-    -I$(GMOCK_DIR) \
+    -I$(GTEST_DIR)/include \
 
 LDFLAGS += \
     -L$(GTEST_LIB_DIR) \
-    -L$(GMOCK_LIB_DIR) \
     -L$(LIB_STATIC_DIR) \
     $(ADDITIONAL_LDFLAGS) \
     -l$(library) \
