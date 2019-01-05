@@ -14,6 +14,10 @@
 class RWLock
 {
 public:
+    // TYPES
+    using size_type = size_t;
+
+    // CREATORS
     RWLock();
     RWLock(RWLock const &) = delete;
     RWLock(RWLock&&) = delete;
@@ -22,6 +26,7 @@ public:
     
     ~RWLock() = default;
 
+    // MUTATORS
     void lock_to_read(void);
     bool try_lock_to_read(void);
 
@@ -31,14 +36,20 @@ public:
     void unlock_from_read(void);
     void unlock_from_write(void);
 
+    // ACCESSORS (for AUTs, mainly)
+    bool isWriterActive(void) const;
+    size_type getActiveReaders(void) const;
+    size_type getReadersWaiting(void) const;
+    size_type getWritersWaiting(void) const;
+
 private:
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
     std::condition_variable read_;   // wait for read
     std::condition_variable write_;   // wait for write
     bool isWriterActive_;
-    unsigned activeReaders_;
-    unsigned readersWaiting_;
-    unsigned writersWaiting_;
+    size_type activeReaders_;
+    size_type readersWaiting_;
+    size_type writersWaiting_;
 };
 
 // adapter to be able to use std guards

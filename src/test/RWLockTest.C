@@ -7,115 +7,120 @@
 using namespace std;
 
 
-// BEGIN DELETE
-
-class IParent
+class RWLockTest : public ::testing::Test
 {
-public:
-    virtual ~IParent() {};
+protected:
+    RWLockTest()
+        : rwlock_{}
+        , rlock_{rwlock_}
+        , wlock_{rwlock_}
+    { }
 
-    virtual void parent_method() = 0;
-};
-
-class Member
-{
-public:
-    void member_method()
+    bool isLockedForRead(void) const
     {
-        cout << "member_method\n";
+        return(rwlock_.getActiveReaders() > 0);
     }
-};
 
-template <class T = Member>
-class Parent2 : public IParent
-{
-public:
-    using member_type = T;
-
-    Parent2(member_type* m) : member{m} {}
-    void parent_method() override
+    bool isLockedForWrite(void) const
     {
-        member->member_method();
+        return rwlock_.isWriterActive();
     }
-private:
-    member_type* member; // member is now of type T* (i.e. member_type*)
+
+    RWLock rwlock_;
+    read_lock rlock_;
+    write_lock wlock_;
 };
 
-template <class T = Member>
-class Parent : public IParent
+TEST_F(RWLockTest, lockToRead_isNotLocked_shouldLockForRead)
 {
-public:
-    Parent() : member{} {}
-    void parent_method() override
+    // excercise SUT
+    auto lock = lock_guard{rlock_};
+
+    // verify output
+    ASSERT_TRUE(isLockedForRead());
+    ASSERT_FALSE(isLockedForWrite());
+}
+
+TEST_F(RWLockTest, lockToWrite_isNotLocked_shouldLockForWrite)
+{
+    // excercise SUT
+    auto lock = lock_guard{wlock_};
+
+    // verify output
+    ASSERT_TRUE(isLockedForWrite());
+    ASSERT_FALSE(isLockedForRead());
+}
+
+TEST_F(RWLockTest, tryLockToRead_isLockedForRead_shouldLock)
+{
+    // setup fixture
+    auto lock = lock_guard{rlock_};
+
+    // exercise SUT
+    // and
+    // verify output
+    ASSERT_TRUE(rwlock_.try_lock_to_read());
+}
+
+TEST_F(RWLockTest, tryLockToRead_isLockedForWrite_shouldNotLock)
+{
+    // setup fixture
+    auto lock = lock_guard{wlock_};
+
+    // exercise SUT
+    // and
+    // verify output
+    ASSERT_FALSE(rwlock_.try_lock_to_read());
+}
+
+TEST_F(RWLockTest, tryLockToWrite_isLockedForRead_shouldNotLock)
+{
+    // setup fixture
+    auto lock = lock_guard{rlock_};
+
+    // exercise SUT
+    // and
+    // verify output
+    ASSERT_FALSE(rwlock_.try_lock_to_write());
+}
+
+TEST_F(RWLockTest, tryLockToWrite_isLockedForWrite_shouldNotLock)
+{
+    // setup fixture
+    auto lock = lock_guard{wlock_};
+
+    // exercise SUT
+    // and
+    // verify output
+    ASSERT_FALSE(rwlock_.try_lock_to_write());
+}
+
+TEST_F(RWLockTest, unlockFromWrite_isLockedForWrite_shouldUnlock)
+{
+    // setup fixture
     {
-        member.member_method();
+        auto lock = lock_guard{wlock_};
+
+    // exercise SUT
+    // leaving scope calls unlock_from_write
     }
-private:
-    using member_type = T;
-    member_type member; // member is now of type T (i.e. member_type)
 
-    template <class U>
-    friend U& GetMemberForTestMock(Parent<U>& parent);
-};
-
-
-// initialize in the test/mock files as this member function is only for
-// testing with mockMembers
-template <class U>
-U& GetMemberForTestMock(Parent<U>& parent)
-{
-    return parent.member;
+    // verify output
+    ASSERT_FALSE(isLockedForWrite());
+    ASSERT_FALSE(isLockedForRead());
 }
 
-class MockMember
+TEST_F(RWLockTest, unlockFromRead_isLockedForRead_shouldUnlock)
 {
-public:
-    MOCK_CONST_METHOD0(member_method, void());
-};
+    // setup fixture
+    {
+        auto lock = lock_guard{rlock_};
 
-TEST(ParentTest, callsMemberMethodOnce)
-{
-    auto parent = Parent<MockMember>{};
-    EXPECT_CALL(GetMemberForTestMock(parent), member_method()).Times(1);
-    parent.parent_method();
+    // exercise SUT
+    // leaving scope calls unlock_from_read
+    }
+
+    // verify output
+    ASSERT_FALSE(isLockedForWrite());
+    ASSERT_FALSE(isLockedForRead());
 }
-
-TEST(ParentTest, callsMemberMethodOnceAgain)
-{
-    auto member = MockMember{};
-    EXPECT_CALL(member, member_method()).Times(1);
-
-    auto parent = Parent2<MockMember>{&member};
-    parent.parent_method();
-}
-
-// END DELETE
-
-
-TEST(RWLockTest, multipleLockToRead)
-{
-    auto rwlock = RWLock{};
-    auto r_lock = read_lock{rwlock};
-    auto w_lock = write_lock{rwlock};
-
-    auto lock = lock_guard{r_lock};
-    ASSERT_EQ(true, rwlock.try_lock_to_read());
-}
-
-
-#if 0
-int main()
-{
-    auto rwlock = RWLock{};
-    auto r_lock = read_lock{rwlock};
-    auto w_lock = write_lock{rwlock};
-
-{
-    auto lock = lock_guard{r_lock};
-}
-
-//    cout << rwlock.try_lock_to_read() << '\n';
-
-    cout << rwlock.try_lock_to_write() << '\n';
-}
-#endif

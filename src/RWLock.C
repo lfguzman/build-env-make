@@ -85,3 +85,27 @@ void RWLock::unlock_from_write(void)
         write_.notify_one();
     }
 }
+
+bool RWLock::isWriterActive(void) const
+{
+    std::lock_guard lock(mutex_);
+    return isWriterActive_;
+}
+
+RWLock::size_type RWLock::getActiveReaders(void) const
+{
+    std::lock_guard lock(mutex_);
+    return activeReaders_;
+}
+
+RWLock::size_type RWLock::getReadersWaiting(void) const
+{
+    std::lock_guard lock(mutex_);
+    return readersWaiting_;
+}
+
+RWLock::size_type RWLock::getWritersWaiting(void) const
+{
+    std::lock_guard lock(mutex_);
+    return writersWaiting_;
+}

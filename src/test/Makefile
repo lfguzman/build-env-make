@@ -3,6 +3,7 @@
 include ../../Makefile.common
 
 sources = \
+    MockWithTemplatesTest.C \
     RWLockTest.C \
 
 # Flags needed to link
