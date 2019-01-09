@@ -88,3 +88,45 @@ TEST(ParentTest, callsMemberMethodOnceAgain)
     auto parent = Parent2<MockMember>{&member};
     parent.parent_method();
 }
+
+// use gmock with an interface
+
+// The class to mock; it is not used, but I left it as illustration.
+class Father : public IParent
+{
+public:
+    Father() = default;
+    virtual ~Father() {};
+    virtual void parent_method() override
+    {
+        cout << "You shall not mock your parents!" << '\n';
+    }
+};
+
+// Function with dependency, but it could be a class or whatever.
+// The idea is to inject our mock IParent/Father to test
+void functionUnderTest(IParent* parent)
+{
+    parent->parent_method();
+}
+
+class MockFather : public IParent
+{
+public:
+    MockFather() = default;
+    virtual ~MockFather() {};
+
+    MOCK_METHOD0(parent_method, void());
+};
+
+TEST(FunctionUnderTest, callParentMethodOnce)
+{
+    // setup fixture
+    auto father = make_unique<MockFather>();
+    EXPECT_CALL(*father, parent_method()).Times(1);
+
+    // exercise SUT
+    functionUnderTest(father.get());
+
+    // output verified by gmock and gtest
+}

@@ -16,6 +16,8 @@ protected:
         , wlock_{rwlock_}
     { }
 
+    ~RWLockTest() = default;
+
     bool isLockedForRead(void) const
     {
         return(rwlock_.getActiveReaders() > 0);
@@ -27,7 +29,7 @@ protected:
     }
 
     RWLock rwlock_;
-    read_lock rlock_;
+    read_lock<> rlock_;  // only difference with adaptor being a template
     write_lock wlock_;
 };
 
@@ -123,4 +125,65 @@ TEST_F(RWLockTest, unlockFromRead_isLockedForRead_shouldUnlock)
     // verify output
     ASSERT_FALSE(isLockedForWrite());
     ASSERT_FALSE(isLockedForRead());
+}
+
+
+using ::testing::Return;
+
+class MockRWLock
+{
+public:
+    MockRWLock() = default;
+    ~MockRWLock() = default;
+
+    MOCK_CONST_METHOD0(lock_to_read, void());
+    MOCK_CONST_METHOD0(try_lock_to_read, bool());
+    MOCK_CONST_METHOD0(unlock_from_read, void());
+};
+
+TEST(read_lockTest, lockUnlock_usingStdLockGuard_shouldCallLockAndUnlock)
+{
+    // setup fixture
+    auto mockRWLock = MockRWLock{};
+    EXPECT_CALL(mockRWLock, lock_to_read()).Times(1);
+    EXPECT_CALL(mockRWLock, try_lock_to_read()).Times(0);
+    EXPECT_CALL(mockRWLock, unlock_from_read()).Times(1);
+
+    // exercise SUT
+    auto rlock = read_lock{mockRWLock};
+    lock_guard{rlock};
+
+    // verify output done by gmock and gtest
+}
+
+TEST(read_lockTest, tryLock_FailsTry_shouldNotAquireLock)
+{
+    // setup fixture
+    auto mockRWLock = MockRWLock{};
+    EXPECT_CALL(mockRWLock, lock_to_read()).Times(0);
+    EXPECT_CALL(mockRWLock, try_lock_to_read()).WillOnce(Return(false));
+    EXPECT_CALL(mockRWLock, unlock_from_read()).Times(0);
+
+    // exercise SUT
+    auto rlock = read_lock{mockRWLock};
+    auto lock = unique_lock{rlock, std::try_to_lock};
+
+    // verify output
+    ASSERT_FALSE(lock) << "It shouldn't have acquired lock";
+}
+
+TEST(read_lockTest, tryLock_SucceedsTry_shouldAquireLock)
+{
+    // setup fixture
+    auto mockRWLock = MockRWLock{};
+    EXPECT_CALL(mockRWLock, lock_to_read()).Times(0);
+    EXPECT_CALL(mockRWLock, try_lock_to_read()).WillOnce(Return(true));
+    EXPECT_CALL(mockRWLock, unlock_from_read()).Times(1);
+
+    // exercise SUT
+    auto rlock = read_lock{mockRWLock};
+    auto lock = unique_lock{rlock, std::try_to_lock};
+
+    // verify output
+    ASSERT_TRUE(lock) << "It should have acquired lock";
 }

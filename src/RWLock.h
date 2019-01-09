@@ -2,14 +2,14 @@
 #define INCLUDED_RWLOCK_H
 
 
-// First iteration of a rwlock with Read Precedence
+// First iteration of a rwlock with Read Precedence.
 
 
 #include <mutex>
 
 
 /**
- * Enables multiple readers to get the lock at one time but only one writer
+ * Enables multiple readers to get the lock at one time but only one writer.
  */
 class RWLock
 {
@@ -52,11 +52,15 @@ private:
     size_type writersWaiting_;
 };
 
-// adapter to be able to use std guards
+// Adapter to be able to use std guards.
+// Template to demonstrate testing with gmock and templates.
+template <typename T = RWLock>
 class read_lock
 {
 public:
-    explicit read_lock(RWLock& lock)
+    using RW_Lock = T;
+
+    explicit read_lock(RW_Lock& lock)
         : rw_lock_{lock}
     { }
 
@@ -77,7 +81,7 @@ public:
     { return rw_lock_.unlock_from_read(); }
 
 private:
-    RWLock& rw_lock_;
+    RW_Lock& rw_lock_;
 };
 
 
