@@ -29,7 +29,7 @@ GTEST_LIB_DIR = $(GTEST_DIR)/lib/gccgtest
 #GTEST_LIB_DIR = $(GTEST_DIR)/lib/gccgtest
 
 # C++ compiler and std version
-CXX = g++-8.2
+CXX = g++-8.3.0
 CPPSTD = -std=c++17
 
 # Flags passed to the C++ compiler
