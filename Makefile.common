@@ -26,7 +26,7 @@ GTEST_DIR = /usr/local
 # for g++-8.2 -std=c++17
 GTEST_LIB_DIR = $(GTEST_DIR)/lib/gccgtest
 # for clang++
-#GTEST_LIB_DIR = $(GTEST_DIR)/lib/gccgtest
+#GTEST_LIB_DIR = $(GTEST_DIR)/lib
 
 # C++ compiler and std version
 CXX = g++-8.3.0

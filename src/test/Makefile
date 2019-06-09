@@ -21,7 +21,7 @@ CPPFLAGS += \
     -I.. \
 
 CXXFLAGS += \
-    -I$(GTEST_DIR)/include \
+#    -I$(GTEST_DIR)/include \
 
 LDFLAGS += \
     -L$(GTEST_LIB_DIR) \
@@ -48,7 +48,7 @@ distclean: clean
 	@rm -f *.d
 
 
-# Set up DYLD_LIBRARY_PATH
+# Setup DYLD_LIBRARY_PATH
 ld_library_path := $(LIB_DIR)
 ifneq ($(DYLD_LIBRARY_PATH),)
     ld_library_path := $(ld_library_path):$(DYLD_LIBRARY_PATH)
