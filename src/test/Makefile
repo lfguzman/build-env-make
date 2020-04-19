@@ -36,7 +36,7 @@ LDFLAGS += \
 all: $(target)
 
 $(target): $(objects) 
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $(objects) -o $@
+	$(CXX) $(LDFLAGS) $(objects) -o $@
 
 .PHONY: clean
 clean:

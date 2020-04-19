@@ -44,10 +44,11 @@ test check: all
 	@echo Making `pwd` $@
 	@$(MAKE) -C test $@
 
+# this target is experimental; gcc and clang differ; ignore
 .PHONY: debug
 debug:
 	@echo Making `pwd` $@
-	@$(MAKE) CDEBUG="-g"
+	@$(MAKE) CDEBUG="-g" CXXOPT="-O0"
 
 
 # Include this to generate make dependencies for C '.h' files. Don't
