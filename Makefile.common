@@ -28,6 +28,10 @@ GMOCK_INCLUDE_DIR = $(GTEST_DIR)/googlemock/include
 LLVM_DIR = /usr/local/opt/llvm
 CXX = $(LLVM_DIR)/bin/clang++
 
+# These group of variables are needed only if your compiler is not the
+# default compiler in our computer (OS). In other words, these are only
+# needed if you install an additional compiler in a location separate
+# from your system's.
 LLVM_INCLUDE_DIR = /usr/local/opt/llvm/include
 LLVM_LIB_DIR = $(LLVM_DIR)/lib
 LD_LLVMFLAGS = -L$(LLVM_LIB_DIR) -Wl,-rpath,$(LLVM_LIB_DIR)
