@@ -15,22 +15,33 @@ ROOT_DIR_NAME = build-env-make
 #####################################################################
 
 
+#####################################################################
+# BEGIN - THIS VARIABLES MAY NEED TO BE UPDATED IN ORDER TO REUSE MAKEFILES
+
+# Google Test and Google Mock directories (now both part of googletest)
+GTEST_DIR = /Users/luis/expect/googletest-release-1.10.0
+GTEST_LIB_DIR = $(GTEST_DIR)/mybuild/lib
+GTEST_INCLUDE_DIR = $(GTEST_DIR)/googletest/include
+GMOCK_INCLUDE_DIR = $(GTEST_DIR)/googlemock/include
+
+# C++ compiler and std version
+LLVM_DIR = /usr/local/opt/llvm
+CXX = $(LLVM_DIR)/bin/clang++
+
+LLVM_INCLUDE_DIR = /usr/local/opt/llvm/include
+LLVM_LIB_DIR = $(LLVM_DIR)/lib
+LD_LLVMFLAGS = -L$(LLVM_LIB_DIR) -Wl,-rpath,$(LLVM_LIB_DIR)
+
+CPPSTD = -std=c++2a
+
+# END - THIS VARIABLES MAY NEED TO BE UPDATED IN ORDER TO REUSE MAKEFILES
+#####################################################################
+
 # root directory path
 ROOT_DIR = $(shell pwd | sed 's/\(^.*'$(ROOT_DIR_NAME)'\).*$$/\1/')
 INCLUDE_DIR = $(ROOT_DIR)/include
 LIB_DIR = $(ROOT_DIR)/lib
 LIB_STATIC_DIR = $(LIB_DIR)/static
-
-# Google Test and Google Mock directories (now both part of googletest)
-GTEST_DIR = /usr/local
-# for g++-8.2 -std=c++17
-GTEST_LIB_DIR = $(GTEST_DIR)/lib/gccgtest
-# for clang++
-#GTEST_LIB_DIR = $(GTEST_DIR)/lib
-
-# C++ compiler and std version
-CXX = g++-8.3.0
-CPPSTD = -std=c++17
 
 # Flags passed to the C++ compiler
 CXXOPT := -O2
@@ -42,9 +53,11 @@ CXXWARNFLAGS := \
 CXXFLAGS := $(CPPSTD) $(CXXWARNFLAGS) $(CXXOPT)
 
 CPPFLAGS = \
+    -I$(LLVM_INCLUDE_DIR) \
     -I$(INCLUDE_DIR) \
 
 LD_FLAGS = \
+    $(LD_LLVMFLAGS) \
     -L$(LIB_DIR) \
 
 LD_STATIC_FLAGS = \

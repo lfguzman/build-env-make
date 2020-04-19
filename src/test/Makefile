@@ -17,17 +17,19 @@ target = alltests
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
 CPPFLAGS += \
-    -isystem $(GTEST_DIR)/include \
+    -isystem $(GTEST_INCLUDE_DIR) \
+    -isystem $(GMOCK_INCLUDE_DIR) \
     -I.. \
 
 CXXFLAGS += \
-#    -I$(GTEST_DIR)/include \
 
 LDFLAGS += \
     -L$(GTEST_LIB_DIR) \
     -L$(LIB_STATIC_DIR) \
     $(ADDITIONAL_LDFLAGS) \
     -l$(library) \
+    -lgtest \
+    -lgmock \
     -lgmock_main \
 
 .PHONY: all
@@ -62,7 +64,11 @@ test check: $(target)
 	@echo
 	@echo DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH)
 	@echo
+ifneq ($(OPTIONS),)
+	./$(target) $(OPTIONS)
+else
 	./$(target)
+endif
 
 # Include this to generate make dependencies for C '.h' files. Don't
 # evaluate dependencies for 'clean' so that those
